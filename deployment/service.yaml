@@ -1,0 +1,19 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: tevents
+spec:
+  runLatest:
+    configuration:
+      revisionTemplate:
+        spec:
+          container:
+            image: gcr.io/s0-demo/tevents:latest
+            env:
+            - name: RELEASE
+              value: "v0.1.8"
+            - name: KNOWN_PUBLISHER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: kws
+                  key: KNOWN_PUBLISHER_TOKEN

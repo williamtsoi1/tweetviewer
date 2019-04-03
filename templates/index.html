@@ -1,0 +1,33 @@
+{{ define "index" }}
+
+{{ template "header" . }}
+
+
+<div id="middle-section">
+    <div id="eventmsg"></div>
+    <div id="eventlog"></div>
+</div>
+
+<div id="example-section">
+    <div id="example">
+        <p>
+            To send message run the below <i>curl</i> command where <i>$TOKEN</i>
+            is the token that this app was configured with
+        </p>
+        <pre>
+curl -H "Content-Type: text/plain" \
+     -H "ce-specversion: 0.2" \
+     -H "ce-type: github.com.mchmarny.knative-ws-example.message" \
+     -H "ce-source: https://github.com/mchmarny/knative-ws-example" \
+     -H "ce-id: $(uuidgen)" \
+     -H "ce-time: $(date +%Y-%m-%dT%H:%M:%S:%Z)" \
+    -H "ce-token: $KNOWN_PUBLISHER_TOKEN" \
+     -X POST --data "My sample message" \
+    {{index . "proto"}}://{{index . "host"}}/v1/event
+        </pre>
+    </div>
+</div>
+
+{{ template "footer" . }}
+
+{{ end }}
