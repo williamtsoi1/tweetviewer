@@ -46,5 +46,6 @@ func TwitterEventsReceived(event cloudevents.Event) {
 		return
 	}
 
-	eventChannel <- data
+	manager.broadcast <- data
+
 }

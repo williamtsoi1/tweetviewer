@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 	"fmt"
+	"net/http"
 
 	"github.com/mchmarny/tevents/pkg/twitter"
 	"github.com/mchmarny/tevents/pkg/utils"
@@ -11,99 +12,109 @@ import (
 )
 
 var (
-	eventChannel = make(chan interface{}, 100)
-	h *hub
+	manager clientManager
 )
 
-
-type hub struct {
-	clients          map[string]*websocket.Conn
-	addClientChan    chan *websocket.Conn
-	removeClientChan chan *websocket.Conn
-	broadcastChan    chan interface{}
+type clientManager struct {
+    clients    map[*client]bool
+    broadcast  chan interface{}
+    register   chan *client
+    unregister chan *client
 }
 
-// run the hub
-func (h *hub) run() {
-	for {
-		select {
-		case conn := <-h.addClientChan:
-			h.addClient(conn)
-		case conn := <-h.removeClientChan:
-			h.removeClient(conn)
-		case m := <-h.broadcastChan:
-			h.broadcastMessage(m)
+func (manager *clientManager) start() {
+    for {
+        select {
+        case conn := <-manager.register:
+            manager.clients[conn] = true
+        case conn := <-manager.unregister:
+            if _, ok := manager.clients[conn]; ok {
+                close(conn.send)
+                delete(manager.clients, conn)
+            }
+		case message := <-manager.broadcast:
+			log.Printf("Broadasting to %d clients: %+v", len(manager.clients), message)
+            for conn := range manager.clients {
+				log.Printf("Broadasting message to client %s", conn.id)
+                select {
+                case conn.send <- message:
+				default:
+                    close(conn.send)
+                    delete(manager.clients, conn)
+                }
+			}
 		}
-	}
+    }
 }
 
-// removeClient removes a conn from the pool
-func (h *hub) removeClient(conn *websocket.Conn) {
-	lc := conn.LocalAddr().String()
-	rc := conn.RemoteAddr().String()
-	log.Printf("Removing client %s -> %s: ", rc, lc)
-	delete(h.clients, lc)
+func (manager *clientManager) send(message interface{}) {
+    for conn := range manager.clients {
+		conn.send <- message
+    }
 }
 
-// addClient adds a conn to the pool
-func (h *hub) addClient(conn *websocket.Conn) {
-	lc := conn.LocalAddr().String()
-	rc := conn.RemoteAddr().String()
-	log.Printf("Adding client %s -> %s: ", rc, lc)
-	h.clients[rc] = conn
+type client struct {
+    id     string
+    socket *websocket.Conn
+    send   chan interface{}
 }
 
-// broadcastMessage sends a message to all client conns in the pool
-func (h *hub) broadcastMessage(m interface{}) {
-	for _, conn := range h.clients {
-		err := websocket.JSON.Send(conn, m)
-		if err != nil {
-			log.Printf("Error broadcasting message: %v", err)
-			h.removeClientChan <- conn
-			return
-		}
-	}
+func (c *client) write() {
+
+    defer func() {
+        c.socket.Close()
+    }()
+
+    for {
+        select {
+		case message, ok := <-c.send:
+			log.Printf("On send %v - %v", message, ok)
+            if !ok {
+				log.Println("Unable to sent")
+                return
+            }
+			websocket.JSON.Send(c.socket, message)
+        }
+    }
 }
+
 
 func initWS(){
-
-	h = &hub{
-		clients:          make(map[string]*websocket.Conn),
-		addClientChan:    make(chan *websocket.Conn),
-		removeClientChan: make(chan *websocket.Conn),
-		broadcastChan:    make(chan interface{}),
+	manager = clientManager{
+		broadcast:  make(chan interface{}, 100),
+		register:   make(chan *client),
+		unregister: make(chan *client),
+		clients:    make(map[*client]bool),
 	}
-
-	go h.run()
-
-	// Mock - Remove
-	mock := utils.MustGetEnv("MOCK_TWEETS", "no")
-	log.Printf("Mocking: %s", mock)
-	if mock == "yes" {
-		go mockTweets()
-	}
-
+	go manager.start()
 }
 
 // WSHandler provides backing service for the UI
 func WSHandler(ws *websocket.Conn) {
 	log.Println("WS connection...")
-	h.addClientChan <- ws
 
-	for {
-		select {
-		case m := <-eventChannel:
-			h.broadcastChan <- m
-		}
+    client := &client{
+		id: utils.MakeUUID(),
+		socket: ws,
+		send: make(chan interface{}),
 	}
+
+    manager.register <- client
+
+    client.write()
+}
+
+// WSMockHandler gens mocked tweets
+func WSMockHandler(w http.ResponseWriter, r *http.Request) {
+	go mockTweets()
+	fmt.Fprint(w, "ok")
 }
 
 
 func mockTweets() {
 	log.Println("Mocking tweets...")
 	for i := 0; i < 100; i++ {
-		data := makeMokeTweet(i)
-		eventChannel <- data
+		manager.broadcast <- makeMokeTweet(i)
 		time.Sleep(1 * time.Second)
 	}
 }
