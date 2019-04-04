@@ -36,7 +36,7 @@ func main() {
 	})
 
 	// Ingres API Handler
-	t, err := cehttp.New(cehttp.WithPath("/v2/twitter"))
+	t, err := cehttp.New(cehttp.WithMethod("POST"), cehttp.WithPath("/v2/twitter"))
 	if err != nil {
 		log.Fatalf("failed to create cloudevents transport, %s", err.Error())
 	}
@@ -46,6 +46,7 @@ func main() {
 		log.Fatalf("failed to create cloudevents client, %s", err.Error())
 	}
 
+	log.Println("Starting twitter receiver...")
 	if err := c.StartReceiver(ctx, handlers.TwitterEventsReceived); err != nil {
 		log.Fatalf("failed to start twitter events receiver, %s", err.Error())
 	}

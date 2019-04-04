@@ -15,6 +15,7 @@ const (
 func TwitterEventsReceived(event cloudevents.Event) {
 
 	// TODO: Implement in source
+	// If token knownPublisherToken
 	//// check for presence of publisher token
 	// var srcToken string
 	// ctx := event.Context.AsV02()

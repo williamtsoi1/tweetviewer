@@ -8,6 +8,8 @@ import (
 // RootHandler handles view page
 func RootHandler(w http.ResponseWriter, r *http.Request) {
 
+	log.Println("Serving index... ")
+
 	proto := r.Header.Get("x-forwarded-proto")
 	if proto == "" {
 		proto = "http"

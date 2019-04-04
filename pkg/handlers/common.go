@@ -7,6 +7,10 @@ import (
 	"github.com/mchmarny/tevents/pkg/utils"
 )
 
+const (
+	defaultPublisherToken = "notset"
+)
+
 var (
 	// Templates for handlers
 	templates           *template.Template
@@ -24,6 +28,6 @@ func InitHandlers() {
 	templates = tmpls
 
 	// know publisher
-	knownPublisherToken = utils.MustGetEnv("KNOWN_PUBLISHER_TOKEN", "")
+	knownPublisherToken = utils.MustGetEnv("KNOWN_PUBLISHER_TOKEN", defaultPublisherToken)
 
 }
