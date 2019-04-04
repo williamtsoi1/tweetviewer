@@ -33,6 +33,8 @@ func main() {
 
 	// UI Handlers
 	mux.HandleFunc("/", handlers.RootHandler)
+
+	// WS Handler
 	mux.Handle("/ws", websocket.Handler(handlers.WSHandler))
 
 	// Health Handler
@@ -65,3 +67,5 @@ func main() {
 	// Block until done.
 	<-ctx.Done()
 }
+
+

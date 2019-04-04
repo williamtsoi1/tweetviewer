@@ -8,11 +8,11 @@ COPY . /src/
 # dependancies
 WORKDIR /src/
 ENV GO111MODULE=on
-RUN go mod download
+RUN go mod tidy
 
 # build
 WORKDIR /src/cmd/
-RUN CGO_ENABLED=0 go build -v -o /tevents
+RUN CGO_ENABLED=0 go build -o /tevents
 
 
 # RUN STAGE
