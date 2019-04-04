@@ -16,9 +16,7 @@ import (
 func main() {
 
 	ctx := context.Background()
-	portStr := utils.MustGetEnv("PORT", "8080")
-
-	port, err := strconv.Atoi(portStr)
+	port, err := strconv.Atoi(utils.MustGetEnv("PORT", "8080"))
 	if err != nil {
 		log.Fatalf("failed to parse port, %s", err.Error())
 	}
@@ -60,7 +58,6 @@ func main() {
 	}
 
 	log.Println("Starting twitter receiver...")
-	log.Printf("Server starting on port %s \n", port)
 	if err := c.StartReceiver(ctx, handlers.TwitterEventsReceived); err != nil {
 		log.Fatalf("failed to start twitter events receiver, %s", err.Error())
 	}

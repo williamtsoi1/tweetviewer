@@ -25,23 +25,39 @@ body {
 #page-header {
 	padding: 0;
 	margin: 10px 0 0 0;
+	clear: both;
+	break-after: always;
+	height: 100px;
 }
 
 #page-header-image {
 	border: 0;
+	margin-left: 25px;
+}
+
+#page-header-image img {
+	width: 100px;
+	height: 100px;
+	float: left;
 }
 
 #page-header-title {
-	color: #999;
-	font-weight: 300;
-	font-size: 2em;
+	color: #666;
+	font-size: 3em;
+	margin: 30px 10px;
+	float: left;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.hashtag {
+	color: #0865ad;
+	font-weight: bold;
 }
 
 #middle-section {
 	margin: 30px 0 0 0;
 	padding: 10px;
-	background-color: #0865ad;
-	height: 360px;
+	height: 630px;
 	overflow: auto;
 }
 
@@ -56,18 +72,38 @@ body {
 	font-size: 1em;
 }
 
-#eventmsg {
-	margin: 0 0 7px 0;
-	color: white;
-	font-family: "Lucida Console", "Courier New", monospace;
-	font-size: 1.5em;
+#tweets {
+	background-color: #0865ad;
+	padding: 0;
+	margin: 5px;
+	height: 600px;
+	overflow: auto;
 }
 
-#eventlog {
-	background-color: white;
-	padding: 5px;
-	height: 300px;
-	overflow: auto;
+#tweets img {
+	width: 72px;
+	height: 72px;
+	float: left;
+	margin: 0 15px 0 0;
+}
+
+div.item-text {
+	margin-left: 10px;
+	padding-left: 10px;
+
+
+}
+
+#tweets b {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 1.2em;
+	color: #0865AD;
+}
+
+#tweets i {
+	font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+	font-size: 1em;
+	font-style: normal;
 }
 
 .error {
@@ -75,18 +111,9 @@ body {
 }
 
 .item {
-	padding: 3px;
-	font-family: "Lucida Console", "Courier New", monospace;
-	font-size: 1em;
-	border-bottom: 4px dotted #dcdcdc;
+	clear:both;
+	padding: 5px;
 	text-align: left;
-}
-
-#example-section {
-	text-align: center;
-}
-
-#example {
-	display: inline-block;
-	text-align: left;
+	background-color: #fff;
+	overflow: auto;
 }

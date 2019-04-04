@@ -2,14 +2,12 @@ window.onload = function () {
 
     console.log("Protocol: " + location.protocol);
     var wsURL = "ws://" + document.location.host + "/ws"
-    // TODO: websocketUpgrade not set in Istio so errs on upgrade if WSS
     if (location.protocol == 'https:') {
         wsURL = "wss://" + document.location.host + "/ws"
     }
     console.log("WS URL: " + wsURL);
 
-    var msg = document.getElementById("eventmsg");
-    var log = document.getElementById("eventlog");
+    var log = document.getElementById("tweets");
 
     function appendLog(item) {
         var doScroll = log.scrollTop > log.scrollHeight - log.clientHeight - 1;
@@ -17,34 +15,34 @@ window.onload = function () {
         if (doScroll) {
             log.scrollTop = log.scrollHeight - log.clientHeight;
         }
+
     }
 
-    function setMsg(msf) {
-        msg.innerHTML = msf;
-    }
+    $('*').each(function () {
+        if ($(this).not(':visible')) {
+            $(this).remove();
+        }
+    });
 
     if (log) {
 
         sock = new WebSocket(wsURL);
 
-
         sock.onopen = function () {
             console.log("connected to " + wsURL);
-            setMsg("<b>Connection Opened</b>");
         };
 
         sock.onclose = function (e) {
             console.log("connection closed (" + e.code + ")");
-            setMsg("<b>Connection closed</b>");
         };
 
         sock.onmessage = function (e) {
             console.log(e);
-            var eventObj = JSON.parse(e.data);
-            console.log(eventObj);
+            var t = JSON.parse(e.data);
+            console.log(t);
             var item = document.createElement("div");
             item.className = "item";
-            item.innerHTML = JSON.stringify(eventObj, undefined, 2);
+            item.innerHTML = "<img src='" + t.user.profile_image_url + "'/><div class='item-text'><b>" + t.user.screen_name + ":</b><br /><i>" + t.text + "</i></div>";
             appendLog(item);
         };
 
