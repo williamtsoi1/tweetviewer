@@ -12,6 +12,7 @@ import (
 
 var (
 	eventChannel = make(chan interface{}, 100)
+	h *hub
 )
 
 
@@ -38,16 +39,18 @@ func (h *hub) run() {
 
 // removeClient removes a conn from the pool
 func (h *hub) removeClient(conn *websocket.Conn) {
-	c := conn.LocalAddr().String()
-	log.Printf("Removing client %s: ", c)
-	delete(h.clients, c)
+	lc := conn.LocalAddr().String()
+	rc := conn.RemoteAddr().String()
+	log.Printf("Removing client %s -> %s: ", rc, lc)
+	delete(h.clients, lc)
 }
 
 // addClient adds a conn to the pool
 func (h *hub) addClient(conn *websocket.Conn) {
-	c := conn.RemoteAddr().String()
-	log.Printf("Adding client %s: ", c)
-	h.clients[c] = conn
+	lc := conn.LocalAddr().String()
+	rc := conn.RemoteAddr().String()
+	log.Printf("Adding client %s -> %s: ", rc, lc)
+	h.clients[rc] = conn
 }
 
 // broadcastMessage sends a message to all client conns in the pool
@@ -62,11 +65,9 @@ func (h *hub) broadcastMessage(m interface{}) {
 	}
 }
 
-// WSHandler provides backing service for the UI
-func WSHandler(ws *websocket.Conn) {
-	log.Println("WS connection...")
+func initWS(){
 
-	h := &hub{
+	h = &hub{
 		clients:          make(map[string]*websocket.Conn),
 		addClientChan:    make(chan *websocket.Conn),
 		removeClientChan: make(chan *websocket.Conn),
@@ -75,8 +76,6 @@ func WSHandler(ws *websocket.Conn) {
 
 	go h.run()
 
-	h.addClientChan <- ws
-
 	// Mock - Remove
 	mock := utils.MustGetEnv("MOCK_TWEETS", "no")
 	log.Printf("Mocking: %s", mock)
@@ -84,16 +83,20 @@ func WSHandler(ws *websocket.Conn) {
 		go mockTweets()
 	}
 
+}
+
+// WSHandler provides backing service for the UI
+func WSHandler(ws *websocket.Conn) {
+	log.Println("WS connection...")
+	h.addClientChan <- ws
+
 	for {
 		select {
 		case m := <-eventChannel:
 			h.broadcastChan <- m
 		}
 	}
-
 }
-
-
 
 
 func mockTweets() {
@@ -104,7 +107,6 @@ func mockTweets() {
 		time.Sleep(1 * time.Second)
 	}
 }
-
 
 func makeMokeTweet(i int) *twitter.SimpleTweet {
 

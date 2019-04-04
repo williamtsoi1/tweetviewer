@@ -30,4 +30,6 @@ func InitHandlers() {
 	// know publisher
 	knownPublisherToken = utils.MustGetEnv("KNOWN_PUBLISHER_TOKEN", defaultPublisherToken)
 
+	initWS()
+
 }
