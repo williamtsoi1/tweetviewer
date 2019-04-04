@@ -18,12 +18,6 @@ window.onload = function () {
 
     }
 
-    $('*').each(function () {
-        if ($(this).not(':visible')) {
-            $(this).remove();
-        }
-    });
-
     if (log) {
 
         sock = new WebSocket(wsURL);

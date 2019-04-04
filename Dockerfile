@@ -2,7 +2,7 @@
 FROM golang:latest as build
 
 # copy
-WORKDIR /go/src/github.com/mchmarny/knative-ws-example/
+WORKDIR /go/src/github.com/mchmarny/tevents/
 COPY . /src/
 
 # dependancies
@@ -12,8 +12,7 @@ RUN go mod download
 
 # build
 WORKDIR /src/cmd/
-RUN CGO_ENABLED=0 go build -v -o /kws
-
+RUN CGO_ENABLED=0 go build -v -o /tevents
 
 
 # RUN STAGE
@@ -21,7 +20,7 @@ FROM alpine as release
 RUN apk add --no-cache ca-certificates
 
 # app executable
-COPY --from=build /kws /app/
+COPY --from=build /tevents /app/
 
 # copy static dependancies
 COPY --from=build /src/templates /app/templates/
@@ -29,4 +28,4 @@ COPY --from=build /src/static /app/static/
 
 # run
 WORKDIR /app/
-ENTRYPOINT ["./kws"]
+ENTRYPOINT ["./tevents"]

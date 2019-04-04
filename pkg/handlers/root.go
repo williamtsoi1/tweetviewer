@@ -3,6 +3,8 @@ package handlers
 import (
 	"log"
 	"net/http"
+
+	"github.com/mchmarny/tevents/pkg/utils"
 )
 
 // RootHandler handles view page
@@ -19,6 +21,7 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 
 	data["host"] = r.Host
 	data["proto"] = proto
+	data["version"] = utils.MustGetEnv("RELEASE", "v0-not-set")
 
 	log.Printf("data: %v", data)
 

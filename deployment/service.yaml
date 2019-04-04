@@ -8,12 +8,10 @@ spec:
       revisionTemplate:
         spec:
           container:
-            image: gcr.io/s0-demo/tevents:latest
+            image: gcr.io/s9-demo/tevents:latest
             env:
             - name: RELEASE
-              value: "v0.1.8"
-            - name: KNOWN_PUBLISHER_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: kws
-                  key: KNOWN_PUBLISHER_TOKEN
+              value: "v0.0.4"
+            - name: MOCK_TWEETS
+              value: "yes"
+

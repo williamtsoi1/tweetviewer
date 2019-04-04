@@ -4,9 +4,6 @@
 test:
 	go test ./... -v
 
-test-event:
-	go test --run NameOfTest ./pkg/handler/event/ -v
-
 run:
 	go run ./cmd/*.go
 
@@ -22,18 +19,11 @@ image:
 
 # DEPLOYMENT
 
-secrets:
-	kubectl create secret generic kws -n demo \
-		--from-literal=KNOWN_PUBLISHER_TOKEN=${KNOWN_PUBLISHER_TOKEN}
+deploy:
+	kubectl apply -f deployment/service.yaml -n demo
 
-secrets-clean:
-	kubectl delete secret kws
-
-deployment:
-	kubectl apply -f deployment/service.yaml
-
-nodeployment:
-	kubectl delete -f deployment/service.yaml
+undeploy:
+	kubectl delete -f deployment/service.yaml  -n demo
 
 # DEMO
 
