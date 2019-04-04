@@ -11,7 +11,5 @@ spec:
             image: gcr.io/s9-demo/tevents:latest
             env:
             - name: RELEASE
-              value: "v0.0.5"
-            - name: MOCK_TWEETS
-              value: "yes"
+              value: "v0.0.9"
 

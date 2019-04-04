@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"log"
 
 	"github.com/cloudevents/sdk-go/pkg/cloudevents"
@@ -11,8 +12,12 @@ const (
 	knownPublisherTokenName = "token"
 )
 
-// TwitterEventsReceived handles the cloud event post
-func TwitterEventsReceived(event cloudevents.Event) {
+// TwitterReceiver later
+type TwitterReceiver struct {
+}
+
+// Receive receives
+func (t *TwitterReceiver) Receive(ctx context.Context, event cloudevents.Event, _ *cloudevents.EventResponse) error {
 
 	// TODO: Implement in source
 	// If token knownPublisherToken
@@ -43,9 +48,11 @@ func TwitterEventsReceived(event cloudevents.Event) {
 	if err := event.DataAs(&data); err != nil {
 		// the content is not a Twitter message
 		log.Printf("Failed to DataAs: %s", err.Error())
-		return
+		return err
 	}
 
 	manager.broadcast <- data
+
+	return nil
 
 }

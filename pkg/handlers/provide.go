@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"log"
-	"time"
-	"fmt"
-	"net/http"
+	// "time"
+	// "fmt"
+	// "net/http"
 
-	"github.com/mchmarny/tevents/pkg/twitter"
+	//"github.com/mchmarny/tevents/pkg/twitter"
 	"github.com/mchmarny/tevents/pkg/utils"
 	"golang.org/x/net/websocket"
 )
@@ -104,35 +104,36 @@ func WSHandler(ws *websocket.Conn) {
     client.write()
 }
 
-// WSMockHandler gens mocked tweets
-func WSMockHandler(w http.ResponseWriter, r *http.Request) {
-	go mockTweets()
-	fmt.Fprint(w, "ok")
-}
+
+// // WSMockHandler gens mocked tweets
+// func WSMockHandler(w http.ResponseWriter, r *http.Request) {
+// 	go mockTweets()
+// 	fmt.Fprint(w, "ok")
+// }
 
 
-func mockTweets() {
-	log.Println("Mocking tweets...")
-	for i := 0; i < 100; i++ {
-		manager.broadcast <- makeMokeTweet(i)
-		time.Sleep(1 * time.Second)
-	}
-}
+// func mockTweets() {
+// 	log.Println("Mocking tweets...")
+// 	for i := 0; i < 100; i++ {
+// 		manager.broadcast <- makeMokeTweet(i)
+// 		time.Sleep(1 * time.Second)
+// 	}
+// }
 
-func makeMokeTweet(i int) *twitter.SimpleTweet {
+// func makeMokeTweet(i int) *twitter.SimpleTweet {
 
-	m := "Lorem ipsum dolor sit amet, porttitor turpis mollis, integer ipsum mattis scelerisque aliquam. In volutpat per."
+// 	m := "Lorem ipsum dolor sit amet, porttitor turpis mollis, integer ipsum mattis scelerisque aliquam. In volutpat per."
 
-	data := &twitter.SimpleTweet{
-		CreatedAt: time.Now().String(),
-		IDStr:     fmt.Sprintf("id-%d", i),
-		Text: fmt.Sprintf("%s %d", m, i),
-		User:      &twitter.SimpleTwitterUser{
-			ProfileImageURL: "https://pbs.twimg.com/profile_images/1044758200048898048/dgHKQIOQ_400x400.jpg",
-			ScreenName: fmt.Sprintf("@username-%d", i),
-		},
-	}
+// 	data := &twitter.SimpleTweet{
+// 		CreatedAt: time.Now().String(),
+// 		IDStr:     fmt.Sprintf("id-%d", i),
+// 		Text: fmt.Sprintf("%s %d", m, i),
+// 		User:      &twitter.SimpleTwitterUser{
+// 			ProfileImageURL: "https://pbs.twimg.com/profile_images/1044758200048898048/dgHKQIOQ_400x400.jpg",
+// 			ScreenName: fmt.Sprintf("@username-%d", i),
+// 		},
+// 	}
 
-	return data
+// 	return data
 
-}
+// }
