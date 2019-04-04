@@ -5,52 +5,65 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
-	"github.com/cloudevents/sdk-go/pkg/cloudevents/client"
+	"github.com/cloudevents/sdk-go"
 	"github.com/mchmarny/tevents/pkg/handlers"
 	"github.com/mchmarny/tevents/pkg/utils"
-	cehttp "github.com/cloudevents/sdk-go/pkg/cloudevents/transport/http"
-
 	"golang.org/x/net/websocket"
 )
 
 func main() {
 
 	ctx := context.Background()
-	port := utils.MustGetEnv("PORT", "8080")
+	portStr := utils.MustGetEnv("PORT", "8080")
+
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		log.Fatalf("failed to parse port, %s", err.Error())
+	}
 
 	// Configs
 	handlers.InitHandlers()
 
+	// Handler Mux
+	mux := http.NewServeMux()
+
 	// Static
-	http.Handle("/static/", http.StripPrefix("/static/",
+	mux.Handle("/static/", http.StripPrefix("/static/",
 		http.FileServer(http.Dir("static"))))
 
 	// UI Handlers
-	http.HandleFunc("/", handlers.RootHandler)
-	http.Handle("/ws", websocket.Handler(handlers.WSHandler))
+	mux.HandleFunc("/", handlers.RootHandler)
+	mux.Handle("/ws", websocket.Handler(handlers.WSHandler))
 
 	// Health Handler
-	http.HandleFunc("/_health", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/_health", func(w http.ResponseWriter, _ *http.Request) {
 		fmt.Fprint(w, "ok")
 	})
 
 	// Ingres API Handler
-	t, err := cehttp.New(cehttp.WithMethod("POST"), cehttp.WithPath("/v2/twitter"))
+	t, err := cloudevents.NewHTTPTransport(
+		cloudevents.WithMethod("POST"),
+		cloudevents.WithPath("/v2/twitter"),
+		cloudevents.WithPort(port),
+	)
 	if err != nil {
 		log.Fatalf("failed to create cloudevents transport, %s", err.Error())
 	}
+	// Provide extra handlers
+	t.Handler = mux
 
-	c, err := client.New(t)
+	c, err := cloudevents.NewClient(t, cloudevents.WithUUIDs(), cloudevents.WithTimeNow())
 	if err != nil {
 		log.Fatalf("failed to create cloudevents client, %s", err.Error())
 	}
 
 	log.Println("Starting twitter receiver...")
+	log.Printf("Server starting on port %s \n", port)
 	if err := c.StartReceiver(ctx, handlers.TwitterEventsReceived); err != nil {
 		log.Fatalf("failed to start twitter events receiver, %s", err.Error())
 	}
-	log.Printf("Server starting on port %s \n", port)
 
 	// Block until done.
 	<-ctx.Done()
