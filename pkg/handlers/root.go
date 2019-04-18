@@ -22,6 +22,7 @@ func RootHandler(w http.ResponseWriter, r *http.Request) {
 	data["host"] = r.Host
 	data["proto"] = proto
 	data["version"] = utils.MustGetEnv("RELEASE", "v0-not-set")
+	data["search"] = utils.MustGetEnv("SEARCH", "#KnativeDemo")
 
 	log.Printf("data: %v", data)
 
