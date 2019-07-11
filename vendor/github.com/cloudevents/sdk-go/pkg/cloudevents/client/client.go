@@ -3,11 +3,12 @@ package client
 import (
 	"context"
 	"fmt"
+	"sync"
+
 	"github.com/cloudevents/sdk-go/pkg/cloudevents"
 	"github.com/cloudevents/sdk-go/pkg/cloudevents/observability"
 	"github.com/cloudevents/sdk-go/pkg/cloudevents/transport"
 	"github.com/cloudevents/sdk-go/pkg/cloudevents/transport/http"
-	"sync"
 )
 
 // Client interface defines the runtime contract the CloudEvents client supports.
@@ -72,6 +73,8 @@ type ceClient struct {
 	transport transport.Transport
 	fn        *receiverFn
 
+	convertFn ConvertFn
+
 	receiverMu        sync.Mutex
 	eventDefaulterFns []EventDefaulter
 }
@@ -102,6 +105,7 @@ func (c *ceClient) obsSend(ctx context.Context, event cloudevents.Event) (*cloud
 			event = fn(event)
 		}
 	}
+
 	// Validate the event conforms to the CloudEvents Spec.
 	if err := event.Validate(); err != nil {
 		return nil, err
@@ -180,4 +184,12 @@ func (c *ceClient) applyOptions(opts ...Option) error {
 		}
 	}
 	return nil
+}
+
+// Convert implements transport Converter.Convert.
+func (c *ceClient) Convert(ctx context.Context, m transport.Message, err error) (*cloudevents.Event, error) {
+	if c.convertFn != nil {
+		return c.convertFn(ctx, m, err)
+	}
+	return nil, err
 }

@@ -5,7 +5,7 @@ test:
 	go test ./... -v
 
 run:
-	go run ./cmd/*.go
+	go run *.go
 
 mod:
 	go mod tidy
@@ -15,7 +15,7 @@ mod:
 image: mod
 	gcloud builds submit \
 		--project cloudylabs-public \
-		--tag gcr.io/cloudylabs-public/tevents:0.1.1
+		--tag gcr.io/cloudylabs-public/tweetviewer:0.2.1
 
 # DEPLOYMENT
 service:
@@ -31,7 +31,7 @@ cleanup:
 
 event:
 	curl -X POST -H "Content-Type: application/json" -d @sample.json \
-		 https://tweets.demo.knative.tech/
+		 https://tweetviewer.demo.knative.tech/
 
 local-event:
 	curl -XPOST -H "Content-Type: application/json" -d @sample.json \
