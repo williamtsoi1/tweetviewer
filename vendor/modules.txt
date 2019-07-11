@@ -1,0 +1,31 @@
+# github.com/cloudevents/sdk-go v0.0.0-20190402205943-58f0318fe886
+github.com/cloudevents/sdk-go
+github.com/cloudevents/sdk-go/pkg/cloudevents
+github.com/cloudevents/sdk-go/pkg/cloudevents/client
+github.com/cloudevents/sdk-go/pkg/cloudevents/context
+github.com/cloudevents/sdk-go/pkg/cloudevents/transport/http
+github.com/cloudevents/sdk-go/pkg/cloudevents/types
+github.com/cloudevents/sdk-go/pkg/cloudevents/datacodec
+github.com/cloudevents/sdk-go/pkg/cloudevents/observability
+github.com/cloudevents/sdk-go/pkg/cloudevents/transport
+github.com/cloudevents/sdk-go/pkg/cloudevents/codec
+github.com/cloudevents/sdk-go/pkg/cloudevents/datacodec/json
+github.com/cloudevents/sdk-go/pkg/cloudevents/datacodec/xml
+# github.com/google/uuid v1.1.1
+github.com/google/uuid
+# github.com/hashicorp/golang-lru v0.5.0
+github.com/hashicorp/golang-lru/simplelru
+# go.opencensus.io v0.19.1
+go.opencensus.io/stats
+go.opencensus.io/stats/view
+go.opencensus.io/tag
+go.opencensus.io/trace
+go.opencensus.io/exemplar
+go.opencensus.io/stats/internal
+go.opencensus.io/internal/tagencoding
+go.opencensus.io/internal
+go.opencensus.io/trace/internal
+go.opencensus.io/trace/tracestate
+go.opencensus.io
+# golang.org/x/net v0.0.0-20190403144856-b630fd6fe46b
+golang.org/x/net/websocket

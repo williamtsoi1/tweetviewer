@@ -1,16 +1,16 @@
 apiVersion: serving.knative.dev/v1alpha1
 kind: Service
 metadata:
-  name: tevents
+  name: tweets
 spec:
   runLatest:
     configuration:
       revisionTemplate:
         spec:
           container:
-            image: gcr.io/s9-demo/tevents:latest
+            image: gcr.io/cloudylabs-public/tevents:0.1.1
             env:
-            - name: RELEASE
-              value: "v0.0.10"
-            - name: SEARCH
-              value: "KnativeDemo"
+              - name: RELEASE
+                value: "v0.0.14-manual"
+              - name: SEARCH
+                value: "knative"

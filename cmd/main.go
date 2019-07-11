@@ -44,7 +44,6 @@ func main() {
 
 	// WS Handler
 	mux.Handle("/ws", websocket.Handler(handlers.WSHandler))
-	//mux.HandleFunc("/wsmock", handlers.WSMockHandler)
 
 	// Health Handler
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {

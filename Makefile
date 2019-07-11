@@ -7,29 +7,31 @@ test:
 run:
 	go run ./cmd/*.go
 
-deps:
+mod:
 	go mod tidy
+	go mod vendor
 
 # BUILD
-
-image:
+image: mod
 	gcloud builds submit \
-		--project s9-demo \
-		--tag gcr.io/s9-demo/tevents
+		--project cloudylabs-public \
+		--tag gcr.io/cloudylabs-public/tevents:0.1.1
 
 # DEPLOYMENT
-
-deploy:
+service:
 	kubectl apply -f deployment/service.yaml -n demo
 
-undeploy:
+trigger:
+	kubectl apply -f deployment/trigger.yaml -n demo
+
+cleanup:
 	kubectl delete -f deployment/service.yaml  -n demo
 
 # DEMO
 
 event:
 	curl -X POST -H "Content-Type: application/json" -d @sample.json \
-		 https://tevents.demo.knative.tech/
+		 https://tweets.demo.knative.tech/
 
 local-event:
 	curl -XPOST -H "Content-Type: application/json" -d @sample.json \

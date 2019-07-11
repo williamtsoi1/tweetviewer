@@ -1,31 +1,19 @@
-# BUILD STAGE
-FROM golang:latest as build
+# BUILD
+FROM golang:latest as builder
 
-# copy
-WORKDIR /go/src/github.com/mchmarny/tevents/
+WORKDIR /src/
 COPY . /src/
 
-# dependancies
-WORKDIR /src/
 ENV GO111MODULE=on
-RUN go mod tidy
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+    go build -a -tags netgo \
+    -ldflags '-w -extldflags "-static"' \
+    -mod vendor \
+    -o app ./cmd
 
-# build
-WORKDIR /src/cmd/
-RUN CGO_ENABLED=0 go build -o /tevents
-
-
-# RUN STAGE
-FROM alpine as release
-RUN apk add --no-cache ca-certificates
-
-# app executable
-COPY --from=build /tevents /app/
-
-# copy static dependancies
-COPY --from=build /src/templates /app/templates/
-COPY --from=build /src/static /app/static/
-
-# run
-WORKDIR /app/
-ENTRYPOINT ["./tevents"]
+# RUN
+FROM gcr.io/distroless/static
+COPY --from=builder /src/app .
+COPY --from=builder /src/templates ./templates/
+COPY --from=builder /src/static ./static/
+ENTRYPOINT ["./app"]
